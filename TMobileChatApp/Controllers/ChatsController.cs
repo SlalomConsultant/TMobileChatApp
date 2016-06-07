@@ -10,6 +10,7 @@ using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Threading.Tasks;
+using System.Web;
 using System.Web.Http;
 using System.Web.Http.Description;
 using TMobileChatApp.Models;
@@ -50,8 +51,9 @@ namespace TMobileChatApp.Controllers
         {
             List<Chat> returnChates = new List<Chat>();
             string userId = await CheckAuthAndGetId();
+            fromDate = fromDate.ToUniversalTime();
 
-            returnChates = db.Chats.Where(c => (c.SenderId == userId || c.RecipientId == userId) && c.PostDate >= fromDate.ToUniversalTime()).ToList();
+            returnChates = db.Chats.Where(c => (c.SenderId == userId || c.RecipientId == userId) && c.PostDate >= fromDate).ToList();
 
             return Ok(returnChates);
         }
@@ -102,7 +104,7 @@ namespace TMobileChatApp.Controllers
                     }
                     else
                     {
-                        throw new InvalidDataException("User not authenticated!");
+                        throw new InvalidDataException(string.Format("User not authenticated, invalid authentication cookies!/r/n{0}/r/n{1}", authCookieStr, rtFaCookieStr));
                     }
                 }
 
@@ -110,7 +112,7 @@ namespace TMobileChatApp.Controllers
             }
             else
             {
-                throw new InvalidDataException("User not authenticated!");
+                throw new InvalidDataException("User not authenticated, no authentication cookies passed!");
             }
         }
     }
