@@ -44,14 +44,14 @@ namespace TMobileChatApp.Controllers
             return StatusCode(HttpStatusCode.OK);
         }
 
-        [Route("chats/sinceDate/{fromDate}")]
+        [Route(@"chats/sinceDate/{fromDate:regex(^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z$)}")]
         [ResponseType(typeof(IEnumerable<Chat>))]
         public async Task<IHttpActionResult> GetChats(DateTime fromDate)
         {
             List<Chat> returnChates = new List<Chat>();
             string userId = await CheckAuthAndGetId();
 
-            returnChates = db.Chats.Where(c => (c.SenderId == userId || c.RecipientId == userId) && c.PostDate >= fromDate).ToList();
+            returnChates = db.Chats.Where(c => (c.SenderId == userId || c.RecipientId == userId) && c.PostDate >= fromDate.ToUniversalTime()).ToList();
 
             return Ok(returnChates);
         }
